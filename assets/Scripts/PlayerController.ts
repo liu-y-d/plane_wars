@@ -1,6 +1,7 @@
-import { _decorator, Component, Node, EventTouch, v3, Prefab, instantiate, PhysicsSystem2D, Contact2DType, Collider2D, IPhysics2DContact, AssetManager, resources, SpriteFrame, Sprite } from 'cc';
+import { _decorator, Component, Node, EventTouch, v3, Prefab, instantiate, PhysicsSystem2D, Contact2DType, Collider2D, IPhysics2DContact, AssetManager, resources, SpriteFrame, Sprite, Game } from 'cc';
 import { EnemyController } from './EnemyController';
 import { BulletController } from './BulletController';
+import { Gloabl } from './Global';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerController')
@@ -11,33 +12,21 @@ export class PlayerController extends Component {
 
   @property
   died: boolean = false;
-  // shot: boolean = false
 
-  onLoad() {
-    // console.log(PhysicsSystem2D.instance.enable)
-    // // 注册全局碰撞回调函数
-    // PhysicsSystem2D.instance?.on(
-    //   Contact2DType.BEGIN_CONTACT,
-    //   this.onBeginContact,
-    //   this);
-  }
-  onBeginContact(
-    selfCollider: Collider2D,
-    otherCollider: Collider2D,
-    contact: IPhysics2DContact | null
-  ) {
-    console.log(1)
-
-
-
-  }
   start() {
+    Gloabl.getInstance().begin()
+
     this.node.on(Node.EventType.TOUCH_MOVE, (touch: EventTouch) => {
-      // this.shot = true;
+      if(Gloabl.getInstance().isPause()) {
+        Gloabl.getInstance().resume()
+      }
       this.node.setWorldPosition(
         v3(touch.getUILocation().x, touch.getUILocation().y)
       );
     });
+    this.node.on(Node.EventType.TOUCH_END,() => {
+      Gloabl.getInstance().pause();
+    })
     // if(this.shot) {
     this.schedule(() => {
       if (!this.died) {
@@ -57,8 +46,13 @@ export class PlayerController extends Component {
 
   }
 
-  die() {
+  /**
+   * 被撞击
+   */
+  hit() {
     this.died = true;
+    Gloabl.getInstance().over();
+    console.log(Gloabl.getInstance())
     resources.load("4/spriteFrame", SpriteFrame, (error: Error, res: SpriteFrame) => {
       this.node.getComponent(Sprite).spriteFrame = res;
       // 300ms后销毁

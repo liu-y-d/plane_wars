@@ -20,16 +20,15 @@ export class ContactCallBack extends Component {
 
     }
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
-        console.log(1)
         // 子弹和敌人碰撞
         if (
             (selfCollider.tag === 0 && otherCollider.tag === 1) ||
             (selfCollider.tag === 1 && otherCollider.tag === 0)
         ) {
-            if (selfCollider.getComponent(EnemyController)) {
-                selfCollider.getComponent(EnemyController).die()
+            if (selfCollider.getComponent(EnemyController) !== null) {
+                selfCollider.getComponent(EnemyController).hit()
             }
-            if (otherCollider.getComponent(BulletController)) {
+            if (otherCollider.getComponent(BulletController) !== null) {
                 otherCollider.getComponent(BulletController).hit();
             }
 
@@ -37,14 +36,14 @@ export class ContactCallBack extends Component {
 
         // 敌人和英雄碰撞
         if (
-            (selfCollider.tag === 1 && otherCollider.tag === 2 && !selfCollider.getComponent(EnemyController).died) ||
-            (selfCollider.tag === 2 && otherCollider.tag === 1 && !selfCollider.getComponent(EnemyController).died)
+            (selfCollider.tag === 1 && otherCollider.tag === 2 && selfCollider.getComponent(EnemyController) !== null && !selfCollider.getComponent(EnemyController).died) ||
+            (selfCollider.tag === 2 && otherCollider.tag === 1 && otherCollider.getComponent(EnemyController) !== null && !otherCollider.getComponent(EnemyController).died)
         ) {
-            if (selfCollider.getComponent(EnemyController)) {
-                selfCollider.getComponent(EnemyController).die()
+            if (selfCollider.getComponent(EnemyController) !== null) {
+                selfCollider.getComponent(EnemyController).hit()
             }
-            if (otherCollider.getComponent(PlayerController)) {
-                otherCollider.getComponent(PlayerController).die();
+            if (otherCollider.getComponent(PlayerController) !== null) {
+                otherCollider.getComponent(PlayerController).hit();
             }
         }
 
